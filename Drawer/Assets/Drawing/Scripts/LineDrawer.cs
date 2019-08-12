@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class LineDrawer : MonoBehaviour {
 
-    Mesh m_mesh;
-    List<Vector3> m_verts = new List<Vector3>();
-    Vector3 m_lastPos;
-    GameObject m_bursh;
-    Material m_material;
-    bool m_start;
+    private Mesh m_mesh;
+    private List<Vector3> m_verts = new List<Vector3>();
+    private Vector3 m_lastPos;
+    private GameObject m_bursh;
+    private Material m_material;
+    private bool m_start;
     public float m_threshold = 5f;
 
     float m_maxx;
@@ -27,25 +27,23 @@ public class LineDrawer : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if(Begin())
         {
-            m_verts.Clear();
-            m_start = true;
+            OnBegin();
         }
-        if (Input.GetMouseButtonUp(0))
+        if (End())
         {
-            m_start = false;
-            DrawerUtility.OptimizedGenerateShape(m_mesh, m_verts);
+            OnEnd();
         }
         if(!m_start)
         {
             return;
         }
-        if (Input.mousePosition == m_lastPos)
+        if (DonotMove())
         {
             return;
         }
-        if((Input.mousePosition - m_lastPos).magnitude < m_threshold)
+        if(TooClose())
         {
             return;
         }
@@ -53,6 +51,38 @@ public class LineDrawer : MonoBehaviour {
         var vertPos = ConvertSceenPosToWorld();
         m_verts.Add(vertPos);
         UpdateMesh();
+    }
+
+    bool Begin()
+    {
+        return Input.GetMouseButtonDown(0);
+    }
+
+    bool End()
+    {
+        return Input.GetMouseButtonUp(0);
+    }
+
+    void OnBegin()
+    {
+        m_verts.Clear();
+        m_start = true;
+    }
+
+    void OnEnd()
+    {
+        m_start = false;
+        DrawerUtility.OptimizedGenerateShape(m_mesh, m_verts);
+    }
+
+    bool DonotMove()
+    {
+        return Input.mousePosition == m_lastPos;
+    }
+
+    bool TooClose()
+    {
+        return (Input.mousePosition - m_lastPos).magnitude < m_threshold;
     }
 
     Vector3 ConvertSceenPosToWorld()
@@ -75,11 +105,6 @@ public class LineDrawer : MonoBehaviour {
         m_mesh.SetIndices(array, MeshTopology.Lines, 0);
     }
 
-    void DrawTriangleLines()
-    {
-        
-    }
-
     void UpdateMesh()
     {
         if(m_verts.Count > 1)
@@ -97,7 +122,7 @@ public class LineDrawer : MonoBehaviour {
                 m_material.color = Color.clear;
             }
         }
-        //Graphics.DrawMesh(m_mesh, Vector3.zero, Quaternion.identity, mat, 0);
+
         if (null == m_bursh)
         {
             m_material = Resources.Load("Paper") as Material;

@@ -16,7 +16,7 @@ public class BrushDrawer: MonoBehaviour
     private List<Vector3> m_pathNodes = new List<Vector3>();
     private int m_lastTouchCount;
 
-    private void Start()
+    protected virtual void Start()
     {
         m_meshFilter = m_shape.GetComponent<MeshFilter>();
         m_meshFilter.sharedMesh = new Mesh();
@@ -76,14 +76,13 @@ public class BrushDrawer: MonoBehaviour
         }
         nodes = tmp;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update ()
     {
         if(InputDown())
         {
             Clear();
-            Camera.main.clearFlags = CameraClearFlags.Nothing;
             m_bstart = true;
         }
         if (InputUp())
@@ -91,7 +90,6 @@ public class BrushDrawer: MonoBehaviour
             Compose(ref m_pathNodes);
             DrawerUtility.OptimizedGenerateShape(m_meshFilter.sharedMesh, m_pathNodes);
             m_pathNodes.Clear();
-            Camera.main.clearFlags = CameraClearFlags.SolidColor;
             m_bstart = false;
         }
         if(CancelClick())
@@ -111,22 +109,35 @@ public class BrushDrawer: MonoBehaviour
         m_lastTouchCount = Input.touchCount;
 	}
 
-    void Clear()
+    virtual protected void Clear()
     {
-        m_meshFilter.sharedMesh.Clear();
+        ClearData();
+        ResetCamera();
+    }
+
+    protected void ClearData()
+    {
+        if(null != m_meshFilter.sharedMesh)
+        {
+            m_meshFilter.sharedMesh.Clear();
+        }
+        m_lastPos = Vector3.zero;
+        m_dots.Clear();
+        foreach(var go in m_brushInstance)
+        {
+            go.SetActive(false);
+        }
+    }
+
+    protected void ResetCamera()
+    {
+        Camera.main.clearFlags = CameraClearFlags.Color;
+        Camera.main.backgroundColor = Color.white;
         StartCoroutine(CoroutineClear());
     }
 
     IEnumerator CoroutineClear()
     {
-        foreach(var go in m_brushInstance)
-        {
-            go.SetActive(false);
-        }
-        Camera.main.clearFlags = CameraClearFlags.Color;
-        Camera.main.backgroundColor = Color.white;
-        m_lastPos = Vector3.zero;
-        m_dots.Clear();
         yield return null;
         Camera.main.clearFlags = CameraClearFlags.Nothing;
     }

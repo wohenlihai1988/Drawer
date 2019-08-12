@@ -29,7 +29,7 @@ public static class DrawerUtility
         return r;
     }
 
-    public static List<Location> GetNodesPath(Vector2 start, Vector2 end, float z, float startx, float starty, float size)
+    public static List<Location> GetNodesPath(Vector2 start, Vector2 end, float z, float startx, float starty, float size, int range)
     {
         var r = new List<Location>();
         var delta = end - start;
@@ -41,7 +41,7 @@ public static class DrawerUtility
         {
             var nextPos = start + dir * size * i;
             int x, y;
-            ScreenToCanvas(nextPos, z, startx, starty, size, out x, out y);
+            ScreenToCanvas(nextPos, z, startx, starty, size, out x, out y, range);
             if (lastx == x && lasty == y)
             {
                 continue;
@@ -61,21 +61,21 @@ public static class DrawerUtility
     }
 
 
-    public static void ScreenToCanvas(Vector3 mousePos, float z, float startx, float starty, float size, out int i, out int j)
+    public static void ScreenToCanvas(Vector3 mousePos, float z, float startx, float starty, float size, out int i, out int j, int range)
     {
         var screenPos = new Vector3(mousePos.x, mousePos.y, z - Camera.main.transform.position.z);
         var pos = Camera.main.ScreenToWorldPoint(screenPos);
-        PosToCanvas(pos, startx, starty, size, out i, out j);
+        PosToCanvas(pos, startx, starty, size, out i, out j, range);
     }
 
-    public static void PosToCanvas(Vector2 pos, float startx, float starty, float size, out int i, out int j)
+    public static void PosToCanvas(Vector2 pos, float startx, float starty, float size, out int i, out int j, int range)
     {
         i = Mathf.FloorToInt((pos.x - startx) / size);
         i = Mathf.Max(0, i);
-        i = Mathf.Min(99, i);
+        i = Mathf.Min(range - 1, i);
         j = Mathf.FloorToInt((pos.y - starty) / size);
         j = Mathf.Max(0, j);
-        j = Mathf.Min(99, j);
+        j = Mathf.Min(range - 1, j);
     }
 
     private static Vector2 GetUV(Vector3 pos, float minx, float maxx, float miny, float maxy)
@@ -175,6 +175,7 @@ public static class DrawerUtility
             }
         }
         Triangulator.Triangulator.Triangulate(v, Triangulator.WindingOrder.Clockwise, out v, out indices);
+        //v2 to v3
         for(var i = 0; i < v.Length; i++)
         {
             var tmp = verts[i];
@@ -182,9 +183,9 @@ public static class DrawerUtility
             tmp.y = v[i].y;
             verts[i] = tmp;
         }
+
         mesh.Clear();
         mesh.SetVertices(verts);
-        var uvs = new List<Vector3>();
         mesh.SetUVs(0, uv);
         mesh.SetIndices(indices, MeshTopology.Triangles, 0);
     }

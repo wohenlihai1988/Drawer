@@ -7,14 +7,16 @@ public class EraseDrawer : MonoBehaviour {
     private float m_starty;
     private float m_scale;
     private Vector3 m_lastPos;
+    private int m_range = 100;
+
 	// Use this for initialization
 	void Start ()
     {
         var src = Resources.Load("Plane");
-        for(int i = 0; i < 100; i++)
+        for(int i = 0; i < m_range; i++)
         {
             m_canvas.Add(new List<GameObject>());
-            for(int j = 0; j < 100; j++)
+            for(int j = 0; j < m_range; j++)
             {
                 var go = GameObject.Instantiate(src) as GameObject;
                 m_canvas[i].Add(go);
@@ -55,12 +57,12 @@ public class EraseDrawer : MonoBehaviour {
         }
         if(m_lastPos == Vector3.zero)
         {
-            DrawerUtility.ScreenToCanvas(Input.mousePosition, m_fixedPosz, m_startx, m_starty, m_scale, out i, out j);
+            DrawerUtility.ScreenToCanvas(Input.mousePosition, m_fixedPosz, m_startx, m_starty, m_scale, out i, out j, m_range);
             m_canvas[i][j].SetActive(false);
         }
         else
         {
-            var list = DrawerUtility.GetNodesPath(m_lastPos, Input.mousePosition, m_fixedPosz, m_startx, m_starty, m_scale);
+            var list = DrawerUtility.GetNodesPath(m_lastPos, Input.mousePosition, m_fixedPosz, m_startx, m_starty, m_scale, m_range);
             foreach(var item in list)
             {
                 m_canvas[item.i][item.j].SetActive(false);
