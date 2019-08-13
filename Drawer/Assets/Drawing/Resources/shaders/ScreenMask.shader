@@ -2,8 +2,9 @@
 {
 	Properties
 	{
-		_MainTex ("Texture", 2D) = "white" {}
-		_BGTex ("Background", 2D) = "white" {}
+		_FrontCol("Front Color", color) = (1, 1,1 ,1)
+		_MainTex("Texture", 2D) = "white" {}
+		_BGTex("Background", 2D) = "white" {}
 		_MaskTex("Mask", 2D) = "white" {}
 	}
 	SubShader
@@ -38,6 +39,9 @@
 			sampler2D _MaskTex;
 			sampler2D _BGTex;
 			float4 _MainTex_ST;
+			float4 _MaskTex_ST;
+			float4 _BGTex_ST;
+			float4 _FrontCol;
 			
 			v2f vert (appdata v)
 			{
@@ -51,14 +55,12 @@
 			fixed4 frag (v2f i) : SV_Target
 			{
 				// sample the texture
-				//fixed4 col = tex2D(_MainTex, i.uv);
-				fixed4 col = fixed4(1, 0, 0, 1);
-				fixed4 bgcol = fixed4(0, 0, 1, 1);//tex2D(_MainTex, i.uv);
+				fixed4 bgcol = tex2D(_BGTex, i.uv);
 				fixed4 maskcol = tex2D(_MaskTex, i.uv);
 				// apply fog
 				UNITY_APPLY_FOG(i.fogCoord, col);
-				col = lerp(bgcol, col, maskcol.a);
-				col = maskcol;
+				fixed4 col = lerp(_FrontCol + bgcol, bgcol, maskcol.r);
+				col.a = 0;
 				return col;
 			}
 			ENDCG

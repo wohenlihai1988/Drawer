@@ -88,10 +88,7 @@ public class BrushDrawer: MonoBehaviour
         }
         if (InputUp())
         {
-            Compose(ref m_pathNodes);
-            DrawerUtility.OptimizedGenerateShape(m_meshFilter.sharedMesh, m_pathNodes);
-            m_pathNodes.Clear();
-            m_bstart = false;
+            OnEnd();
         }
         if(CancelClick())
         {
@@ -109,6 +106,14 @@ public class BrushDrawer: MonoBehaviour
         }
         m_lastTouchCount = Input.touchCount;
 	}
+
+    protected virtual void OnEnd()
+    {
+            Compose(ref m_pathNodes);
+            DrawerUtility.OptimizedGenerateShape(m_meshFilter.sharedMesh, m_pathNodes);
+            m_pathNodes.Clear();
+            m_bstart = false;
+    }
 
     virtual protected void Clear()
     {

@@ -6,6 +6,7 @@ public class RTBrushDrawer : BrushDrawer
 {
     private RenderTexture m_renderTex;
     public RawImage m_rawImage;
+    public Text m_text;
     public MeshRenderer m_renderer;
     public Material m_material;
     private CameraEffect m_cameraEffect;
@@ -23,6 +24,15 @@ public class RTBrushDrawer : BrushDrawer
         m_material.SetTexture("_MaskTex", CameraEffect.Instance.m_renderTexture);
         m_renderer.sharedMaterial.SetTexture("_MainTex", CameraEffect.Instance.m_renderTexture);
         //m_rawImage.texture = CameraEffect.Instance.m_renderTexture;
+    }
+
+    protected override void OnEnd()
+    {
+        base.OnEnd();
+        m_cameraEffect.CheckGrade((grade) =>
+        {
+            m_text.text = grade.ToString();
+        });
     }
 
     protected override void Update()
