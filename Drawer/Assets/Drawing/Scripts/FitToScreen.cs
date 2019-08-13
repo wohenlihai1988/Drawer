@@ -9,7 +9,7 @@ public class FitToScreen : MonoBehaviour
     void Start()
     {
         var mesh = new Mesh();
-        m_plane.GetComponent<MeshFilter>().sharedMesh = mesh;
+        m_plane.GetComponent<MeshFilter>().mesh = mesh;
         mesh.SetVertices(new List<Vector3>
         {
             new Vector3(-0.5f, -0.5f, 0),
@@ -39,7 +39,7 @@ public class FitToScreen : MonoBehaviour
     void Update()
     {
         var distance = transform.position.z - m_camera.transform.position.z;
-        var height = Mathf.Tan(m_camera.fieldOfView * 0.5f * Mathf.Deg2Rad) * distance;
+        var height = Mathf.Tan(m_camera.fieldOfView * 0.5f * Mathf.Deg2Rad) * distance * 2;
         var width = height * m_camera.aspect;
         m_plane.transform.localScale = new Vector3(width, height, 1);
     }

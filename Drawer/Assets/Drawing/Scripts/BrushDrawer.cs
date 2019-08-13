@@ -15,6 +15,7 @@ public class BrushDrawer: MonoBehaviour
     private MeshFilter m_meshFilter;
     private List<Vector3> m_pathNodes = new List<Vector3>();
     private int m_lastTouchCount;
+    public Camera m_camera;
 
     protected virtual void Start()
     {
@@ -78,7 +79,7 @@ public class BrushDrawer: MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update ()
+    protected virtual void Update ()
     {
         if(InputDown())
         {
@@ -131,15 +132,15 @@ public class BrushDrawer: MonoBehaviour
 
     protected void ResetCamera()
     {
-        Camera.main.clearFlags = CameraClearFlags.Color;
-        Camera.main.backgroundColor = Color.white;
+        m_camera.clearFlags = CameraClearFlags.Color;
+        m_camera.backgroundColor = Color.white;
         StartCoroutine(CoroutineClear());
     }
 
     IEnumerator CoroutineClear()
     {
         yield return null;
-        Camera.main.clearFlags = CameraClearFlags.Nothing;
+        m_camera.clearFlags = CameraClearFlags.Nothing;
     }
 
     void UpdateCanvas()
